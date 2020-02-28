@@ -38,7 +38,7 @@ class Opus::Types::Test::Props::Private::SetterFactoryTest < Critic::Unit::UnitT
     end
 
     it 'does not run when validate_prop_value is called' do
-      TestSetValidate.new(validated: 5)
+      TestSetValidate.validate_prop_value(:validated, 5)
     end
   end
 end

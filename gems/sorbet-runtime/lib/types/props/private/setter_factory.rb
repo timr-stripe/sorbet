@@ -13,12 +13,13 @@ module T::Props
         params(
           klass: T.all(Module, T::Props::ClassMethods),
           prop: Symbol,
-          rules: T::Hash[Symbol, T.untyped]
+          rules: T::Hash[Symbol, T.untyped],
+          add_validate: T::Boolean,
         )
         .returns(SetterProc)
         .checked(:never)
       end
-      def self.build_setter_proc(klass, prop, rules)
+      def self.build_setter_proc(klass, prop, rules, add_validate: true)
         # Our nil check works differently than a simple T.nilable for various
         # reasons (including the `raise_on_nil_write` setting, the existence
         # of defaults & factories, and the fact that we allow `T.nilable(Foo)`
@@ -32,7 +33,11 @@ module T::Props
           T::Utils::Nilable.get_underlying_type_object(rules.fetch(:type_object))
         end
         accessor_key = rules.fetch(:accessor_key)
-        validate = rules[:setter_validate] || NOOP_VALIDATE
+        validate = if add_validate
+                     rules[:setter_validate] || NOOP_VALIDATE
+                   else
+                     NOOP_VALIDATE
+                   end
 
         # It seems like a bug that this affects the behavior of setters, but
         # some existing code relies on this behavior
